@@ -1,0 +1,31 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="net.galmiza.android.spectrogram"
+    android:installLocation="auto"
+    android:versionCode="4"
+    android:versionName="1.1.1" >
+
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- <uses-permission android:name="android.permission.WAKE_LOCK" /> -->
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.AppCompat.Light" >
+        <activity
+            android:name="net.galmiza.android.spectrogram.SpectrogramActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTop"
+            android:configChanges="" > <!-- android:screenOrientation="landscape" -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="net.galmiza.android.spectrogram.PreferencesActivity"
+            android:label="@string/app_name" >
+        </activity>
+    </application>
+
+</manifest>

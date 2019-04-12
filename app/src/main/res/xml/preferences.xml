@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    
+	<PreferenceCategory android:title="@string/preferences_category_processing">
+	    
+	    <ListPreference
+			android:title="@string/preferences_fft_resolution_title"
+			android:key="fft_resolution"
+			android:defaultValue="@string/preferences_fft_resolution_default_value"
+			android:entries="@array/preferences_fft_resolutions_values"
+			android:entryValues="@array/preferences_fft_resolutions_values"
+			android:enabled="true" />
+
+	    <ListPreference
+			android:title="@string/preferences_window_type_title"
+			android:key="window_type"
+			android:defaultValue="@string/preferences_window_type_default_value"
+			android:entries="@array/preferences_window_type_values"
+			android:entryValues="@array/preferences_window_type_values"
+			android:enabled="true" />
+
+	</PreferenceCategory>
+	
+	
+	
+	<PreferenceCategory android:title="@string/preferences_category_rendering">
+	    
+		<ListPreference 
+	        android:title="@string/preferences_frequency_scale_title"
+			android:key="frequency_scale"
+			android:defaultValue="@string/preferences_frequency_scale_default_value"
+			android:entries="@array/preferences_scale_values"
+			android:entryValues="@array/preferences_scale_values"
+		 	android:enabled="true" />
+		
+		<ListPreference 
+	        android:title="@string/preferences_color_scale_title"
+			android:key="color_scale"
+			android:defaultValue="@string/preferences_color_scale_default_value"
+			android:entries="@array/preferences_color_scale_values"
+			android:entryValues="@array/preferences_color_scale_values"
+		 	android:enabled="true" />
+		
+	</PreferenceCategory>
+	
+	<PreferenceCategory android:title="@string/preferences_category_system">
+	    
+	    <CheckBoxPreference 
+	        android:title="@string/preferences_keep_screen_on_title"
+	        android:summary="@string/preferences_keep_screen_on_summary"
+	        android:key="keep_screen_on"
+	        android:defaultValue="true"
+		 	android:enabled="true"
+	        android:disableDependentsState="true" />
+	    
+	    <CheckBoxPreference 
+	        android:title="@string/preferences_night_mode_title"
+	        android:summary="@string/preferences_night_mode_summary"
+	        android:key="night_mode"
+	        android:defaultValue="true"
+		 	android:enabled="true"
+	        android:disableDependentsState="true" />
+		
+	</PreferenceCategory>
+</PreferenceScreen>

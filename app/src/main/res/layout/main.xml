@@ -1,0 +1,41 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads"
+    xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/linearlayout_main"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity" >
+
+	<TextView
+	    android:id="@+id/textview_time_header"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:textSize="14sp"
+	    android:padding="3sp"
+		android:clickable="true"
+		android:onClick="onTimeViewHeaderClick" />
+		
+    <net.galmiza.android.spectrogram.TimeView
+        android:id="@+id/time_view"
+	    android:layout_weight="1"
+	    android:layout_width="fill_parent"
+	    android:layout_height="0dip" />
+    
+	<TextView
+	    android:id="@+id/textview_frequency_header"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:textSize="14sp"
+	    android:padding="3sp"
+		android:clickable="true"
+		android:onClick="onFrequencyViewHeaderClick" />
+	
+    <net.galmiza.android.spectrogram.FrequencyView
+        android:id="@+id/frequency_view"
+	    android:layout_weight="2"
+	    android:layout_width="fill_parent"
+	    android:layout_height="0dip" />
+
+</LinearLayout>
