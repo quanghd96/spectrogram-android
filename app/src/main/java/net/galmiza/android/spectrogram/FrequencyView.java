@@ -15,7 +15,6 @@
 
 package net.galmiza.android.spectrogram;
 
-import net.galmiza.android.spectrogram.Misc;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;

@@ -29,7 +29,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import net.galmiza.android.engine.sound.SoundEngine;
-import net.galmiza.android.spectrogram.ContinuousRecord.OnBufferReadyListener;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -88,8 +87,8 @@ public class SpectrogramActivity extends AppCompatActivity {
 		
 		// Create view for frequency display
 		setContentView(R.layout.main);
-		frequencyView = (FrequencyView) findViewById(R.id.frequency_view);
-		timeView = (TimeView) findViewById(R.id.time_view);
+		frequencyView = findViewById(R.id.frequency_view);
+		timeView = findViewById(R.id.time_view);
 		if (Misc.getPreference(this, "keep_screen_on", false))
 			frequencyView.setKeepScreenOn(true);
 		frequencyView.setFFTResolution(fftResolution);
@@ -134,11 +133,11 @@ public class SpectrogramActivity extends AppCompatActivity {
 		// Time view
 		DecimalFormat df = new DecimalFormat();
 		df.setMaximumFractionDigits(2);
-		TextView time = (TextView) findViewById(R.id.textview_time_header);
+		TextView time = findViewById(R.id.textview_time_header);
 		time.setText(String.format(getString(R.string.view_header_time), df.format(1000.0f*fftBuffer.length/samplingRate)));
 			
 		// Freqnecy view
-		TextView frequency = (TextView) findViewById(R.id.textview_frequency_header);
+		TextView frequency = findViewById(R.id.textview_frequency_header);
 		String window = Misc.getPreference(
 				this,
 				"window_type",
@@ -165,12 +164,7 @@ public class SpectrogramActivity extends AppCompatActivity {
 	 * Control recording service
 	 */
 	private void startRecording() {
-		recorder.start(new OnBufferReadyListener() {
-			@Override
-			public void onBufferReady(short[] recordBuffer) {
-				getTrunks(recordBuffer);
-			}
-		});
+		recorder.start(recordBuffer -> getTrunks(recordBuffer));
 	}
 	private void stopRecording() {
 		recorder.stop();
@@ -385,12 +379,9 @@ public class SpectrogramActivity extends AppCompatActivity {
 		nativeLib.toPolar(re, im, n);	// Move to polar base
 
 		frequencyView.setMagnitudes(re);
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				frequencyView.invalidate();
-				timeView.invalidate();
-			}
+		runOnUiThread(() -> {
+			frequencyView.invalidate();
+			timeView.invalidate();
 		});
 	}
 	

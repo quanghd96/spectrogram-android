@@ -87,15 +87,12 @@ public class ContinuousRecord {
 			audioRecord.startRecording(); 
 	       	final short[] recordBuffer = new short[recordLength];
 	
-	       	thread = new Thread(new Runnable() {
-				@Override
-				public void run() {
-					while (run) {
-				       	audioRecord.read(recordBuffer, 0, recordLength);
-				       	listener.onBufferReady(recordBuffer);
-					}
-				}
-			});
+	       	thread = new Thread(() -> {
+				   while (run) {
+						  audioRecord.read(recordBuffer, 0, recordLength);
+						  listener.onBufferReady(recordBuffer);
+				   }
+			   });
 	       	thread.start();
 			//Log.d("ContinuousRecord","Service started");
 		}
