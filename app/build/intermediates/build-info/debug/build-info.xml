@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<instant-run
+    abi="arm64-v8a,armeabi-v7a,armeabi"
+    api-level="28"
+    build-mode="COLD"
+    density="xxhdpi"
+    format="10"
+    ir-eligibility="CLASS_ADDED"
+    plugin-version="3.3.2"
+    timestamp="1555059420799"
+    token="3748686827761175759"
+    verifier="COLD_SWAP_REQUESTED" >
+
+    <task
+        name="javac"
+        duration="398" />
+    <task
+        name="instant-run-dex"
+        duration="0" />
+    <task
+        name="instant-run-transform"
+        duration="22" />
+    <task
+        name="verifier"
+        duration="2" />
+
+    <artifact
+        location="/Users/quang/StudioProjects/spectrogram-android/app/build/intermediates/split-apk/debug/slices/slice_2.apk"
+        type="SPLIT" />
+    <artifact
+        location="/Users/quang/StudioProjects/spectrogram-android/app/build/intermediates/split-apk/debug/slices/slice_9.apk"
+        type="SPLIT" />
+
+    <build
+        build-mode="FULL"
+        timestamp="1555057194577"
+        verifier="FULL_BUILD_REQUESTED" >
+        <artifact
+            location="/Users/quang/StudioProjects/spectrogram-android/app/build/intermediates/resources/instant-run/debug/resources-debug.apk"
+            type="SPLIT" />
+        <artifact
+            location="/Users/quang/StudioProjects/spectrogram-android/app/build/intermediates/split-apk/debug/slices/slice_3.apk"
+            type="SPLIT" />
+        <artifact
+            location="/Users/quang/StudioProjects/spectrogram-android/app/build/intermediates/split-apk/debug/slices/slice_9.apk"
+            type="SPLIT" />
+        <artifact
+            location="/Users/quang/StudioProjects/spectrogram-android/app/build/intermediates/split-apk/debug/slices/slice_8.apk"
+            type="SPLIT" />
+        <artifact
+            location="/Users/quang/StudioProjects/spectrogram-android/app/build/intermediates/split-apk/debug/slices/slice_7.apk"
+            type="SPLIT" />
+        <artifact
+            location="/Users/quang/StudioProjects/spectrogram-android/app/build/intermediates/split-apk/debug/slices/slice_2.apk"
+            type="SPLIT" />
+        <artifact
+            location="/Users/quang/StudioProjects/spectrogram-android/app/build/intermediates/split-apk/debug/dep/dependencies.apk"
+            type="SPLIT" />
+        <artifact
+            location="/Users/quang/StudioProjects/spectrogram-android/app/build/intermediates/split-apk/debug/slices/slice_5.apk"
+            type="SPLIT" />
+        <artifact
+            location="/Users/quang/StudioProjects/spectrogram-android/app/build/intermediates/split-apk/debug/slices/slice_4.apk"
+            type="SPLIT" />
+        <artifact
+            location="/Users/quang/StudioProjects/spectrogram-android/app/build/intermediates/split-apk/debug/slices/slice_6.apk"
+            type="SPLIT" />
+        <artifact
+            location="/Users/quang/StudioProjects/spectrogram-android/app/build/intermediates/split-apk/debug/slices/slice_1.apk"
+            type="SPLIT" />
+        <artifact
+            location="/Users/quang/StudioProjects/spectrogram-android/app/build/intermediates/split-apk/debug/slices/slice_0.apk"
+            type="SPLIT" />
+        <artifact
+            location="/Users/quang/StudioProjects/spectrogram-android/app/build/intermediates/instant-run-apk/debug/app-debug.apk"
+            type="SPLIT_MAIN" />
+    </build>
+    <build
+        build-mode="COLD"
+        ir-eligibility="CLASS_ADDED"
+        timestamp="1555059420799"
+        verifier="COLD_SWAP_REQUESTED" >
+        <artifact
+            location="/Users/quang/StudioProjects/spectrogram-android/app/build/intermediates/split-apk/debug/slices/slice_2.apk"
+            type="SPLIT" />
+        <artifact
+            location="/Users/quang/StudioProjects/spectrogram-android/app/build/intermediates/split-apk/debug/slices/slice_9.apk"
+            type="SPLIT" />
+    </build>
+
+</instant-run>
