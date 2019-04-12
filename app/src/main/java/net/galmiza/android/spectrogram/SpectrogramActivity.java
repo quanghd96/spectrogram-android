@@ -28,8 +28,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import net.galmiza.android.engine.sound.SoundEngine;
-
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -305,7 +303,7 @@ public class SpectrogramActivity extends AppCompatActivity {
 		fftBuffer = new short[n];
 		re = new float[n];
 		im = new float[n];
- 		bufferStack = new ArrayList<short[]>();
+ 		bufferStack = new ArrayList<>();
 		int l = recorder.getBufferLength()/(n/2);
 		for (int i=0; i<l+1; i++) //+1 because the last one has to be used again and sent to first position
 			bufferStack.add(new short[n/2]); // preallocate to avoid new within processing loop
