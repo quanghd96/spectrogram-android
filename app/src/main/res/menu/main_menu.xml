@@ -2,17 +2,21 @@
 	  xmlns:app="http://schemas.android.com/apk/res-auto" >
 
 <item android:id="@+id/action_bar_menu_settings" 
-      android:title="Settings"
+      android:title="@string/menu_main_item_settings"
 	  android:icon="@drawable/ic_action_settings"
       app:showAsAction="ifRoom" />
 <item android:id="@+id/action_bar_menu_pause" 
-      android:title="Pause"
+      android:title="@string/menu_pause"
 	  android:icon="@drawable/ic_action_pause"
       app:showAsAction="ifRoom" />	  
 <item android:id="@+id/action_bar_menu_play" 
-      android:title="Play"
+      android:title="@string/menu_play"
 	  android:icon="@drawable/ic_action_play"
 	  android:visibility="gone"
       app:showAsAction="ifRoom" />
-
+	<item android:id="@+id/action_bar_menu_close"
+		android:title="@string/menu_play"
+		android:icon="@drawable/ic_action_close"
+		android:visibility="gone"
+		app:showAsAction="ifRoom" />
 </menu>

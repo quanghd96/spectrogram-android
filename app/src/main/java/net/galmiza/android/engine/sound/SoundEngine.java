@@ -11,19 +11,9 @@ public class SoundEngine {
 
     public native void toPolar(float[] var1, float[] var2, int var3);
 
-    public native void toCartesian(float[] var1, float[] var2, int var3);
-
     public native void shortToFloat(short[] var1, float[] var2, int var3);
 
-    public native void floatToShort(float[] var1, short[] var2, int var3);
-
-    public native void clearShort(short[] var1, int var2);
-
     public native void clearFloat(float[] var1, int var2);
-
-    public native void getMeanFrequency(float[] var1, float[] var2, int var3);
-
-    public native void window(float[] var1, int var2);
 
     public native void windowRectangular(float[] var1, int var2);
 

@@ -5,6 +5,8 @@
 	
     <!-- Menu -->
     <string name="menu_main_item_settings">Configuration</string>
+    <string name="menu_play">Play</string>
+    <string name="menu_pause">Pause</string>
     
     <!-- View headers -->
     <string name="view_header_time">Echantillon: %1$s ms</string>
@@ -74,6 +76,7 @@
     <string-array name="preferences_configuration">
 		<item>string</item><item>summary</item><item>fft_resolution</item><item>%s</item>
 		<item>string</item><item>summary</item><item>window_type</item><item>Fenêtrage %s</item>
+        <item>string</item><item>summary</item><item>frequency_scale</item><item>%s</item>
 		<item>string</item><item>summary</item><item>color_scale</item><item>%s</item>
 	</string-array>
 </resources>

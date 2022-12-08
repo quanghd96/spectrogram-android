@@ -15,50 +15,60 @@
 
 package net.galmiza.android.spectrogram;
 
-
+import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.PreferenceActivity;
-import android.preference.PreferenceManager;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceManager;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.preference.PreferenceFragmentCompat;
+
+import java.util.Objects;
 
 /**
  * Renders preferences as defined in xml/preferences.xml
  * Formats text using string patterns defined in values-xx/string.xml
  * Note that activity is registered as activity in the manifest file AndroidManifest.xml
  */
-public class PreferencesActivity extends PreferenceActivity implements OnSharedPreferenceChangeListener {
-	@SuppressWarnings("deprecation")
+public class PreferencesFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
+
+	private @Nullable Context context;
+
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		addPreferencesFromResource(R.xml.preferences);
-		
-		// Init values
-	    
-	    // Run update
-	    getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
-		UpdateConfiguration(R.array.preferences_configuration);
+	public void onAttach(@NonNull Context context) {
+		super.onAttach(context);
+
+		this.context = context;
+
+		UpdateConfiguration(R.array.preferences_configuration, context);
 	}
-	
+
+	@Override
+	public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String rootKey) {
+		setPreferencesFromResource(R.xml.preferences, rootKey);
+
+		Objects.requireNonNull(getPreferenceScreen().getSharedPreferences()).registerOnSharedPreferenceChangeListener(this);
+	}
+
 	/**
 	 * UpdateConfiguration
 	 * Map items of ressourceId to several arrays string[3] = type, key, pattern defined in string.xml
 	 * Replaces summary of preference 'key' by 'pattern' taking current value as input 
 	 */
-	@SuppressWarnings("deprecation")
-	private void UpdateConfiguration(int ressourceId) {
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-		String[] cf = getResources().getStringArray(ressourceId);
+
+	private void UpdateConfiguration(int resourceId, @NonNull Context context) {
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+		String[] cf = getResources().getStringArray(resourceId);
 		
 		for (int i=0; i<cf.length/4; i++) {
-			String type = cf[4*i+0];
+			String type = cf[4 * i];
 			String object = cf[4*i+1];
 			String key = cf[4*i+2];
 			String pattern = cf[4*i+3];
 			
-			Preference preference = (Preference) findPreference(key);
+			Preference preference = findPreference(key);
 			if (preference == null) continue;
 			
 			String text = "";
@@ -71,6 +81,8 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
 	}
 	public void onSharedPreferenceChanged(SharedPreferences preferences, String key) {
 		// Whatever the change is, update all!
-		UpdateConfiguration(R.array.preferences_configuration);
+		if (this.context != null) {
+			UpdateConfiguration(R.array.preferences_configuration, this.context);
+		}
 	}
 }

@@ -26,6 +26,8 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import androidx.annotation.Nullable;
+
 /**
  * Class associated with the spectrogram view
  * Handles events:
@@ -34,21 +36,19 @@ import android.view.View;
 public class FrequencyView extends View {
     
     // Attributes
-    private Activity activity;
-    private Paint paint = new Paint();
-    private Bitmap bitmap;
-    private Canvas canvas;
+    private final Activity activity;
+    private final Paint paint = new Paint();
+    private @Nullable Bitmap bitmap;
+    private @Nullable Canvas canvas;
     private int pos;
     private int samplingRate;
     private int width, height;
     private float[] magnitudes;
-    private int[] colorRainbow = new int[] {    0xFFFFFFFF, 0xFFFF00FF, 0xFFFF0000, 0xFFFFFF00, 0xFF00FF00, 0xFF00FFFF, 0xFF0000FF, 0xFF000000 };
-    private int[] colorFire = new int[] {    0xFFFFFFFF, 0xFFFFFF00, 0xFFFF0000, 0xFF000000 };
-    private int[] colorIce = new int[] {    0xFFFFFFFF, 0xFF00FFFF, 0xFF0000FF, 0xFF000000 };
-    private int[] colorGrey = new int[] {    0xFFFFFFFF, 0xFF000000 };
-    
-    // Window
-    float minX, minY, maxX, maxY;
+    private final int[] colorRainbow = new int[] {    0xFFFFFFFF, 0xFFFF00FF, 0xFFFF0000, 0xFFFFFF00, 0xFF00FF00, 0xFF00FFFF, 0xFF0000FF, 0xFF000000 };
+    private final int[] colorFire = new int[] {    0xFFFFFFFF, 0xFFFFFF00, 0xFFFF0000, 0xFF000000 };
+    private final int[] colorIce = new int[] {    0xFFFFFFFF, 0xFF00FFFF, 0xFF0000FF, 0xFF000000 };
+    private final int[] colorGrey = new int[] {    0xFFFFFFFF, 0xFF000000 };
+
     public FrequencyView(Context context) {
         super(context);
         activity = (Activity) Misc.getAttribute("activity");
@@ -64,8 +64,13 @@ public class FrequencyView extends View {
         width = w;
         height = h;
         if (bitmap!=null)    bitmap.recycle();
-        bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        canvas = new Canvas(bitmap);
+        if (width > 0 && height > 0) {
+            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            canvas = new Canvas(bitmap);
+        } else {
+            bitmap = null;
+            canvas = null;
+        }
     }
     @SuppressLint("ClickableViewAccessibility")
 	@Override
@@ -96,10 +101,20 @@ public class FrequencyView extends View {
     public void onDraw(Canvas canvas) {
         int[] colors = null;
         String colorScale = Misc.getPreference(activity, "color_scale", activity.getString(R.string.preferences_color_scale_default_value));
-             if (colorScale.equals("Grey"))     colors = colorGrey;
-        else if (colorScale.equals("Fire"))     colors = colorFire;
-        else if (colorScale.equals("Ice"))      colors = colorIce;
-        else if (colorScale.equals("Rainbow"))  colors = colorRainbow;
+        switch (colorScale) {
+            case "Grey":
+                colors = colorGrey;
+                break;
+            case "Fire":
+                colors = colorFire;
+                break;
+            case "Ice":
+                colors = colorIce;
+                break;
+            case "Rainbow":
+                colors = colorRainbow;
+                break;
+        }
 
         int wColor = 10;
         int wFrequency = 30;
@@ -112,28 +127,32 @@ public class FrequencyView extends View {
         
         // Update buffer bitmap
         paint.setColor(Color.BLACK);
-        this.canvas.drawLine(pos%rWidth, 0, pos%rWidth, height, paint);
+        if (this.canvas != null) {
+            this.canvas.drawLine(pos%rWidth, 0, pos%rWidth, height, paint);
+        }
         for (int i=0; i<height; i++) {
-        	float j = getValueFromRelativePosition((float)(height-i)/height, 1, samplingRate/2, logFrequency);
-        	j /= samplingRate/2;
+        	float j = getValueFromRelativePosition((float)(height-i)/height, (float)samplingRate/2, logFrequency);
+        	j /= (double) samplingRate /2;
         	float mag = magnitudes[(int) (j*magnitudes.length/2)];
             float db = (float) Math.max(0,-20*Math.log10(mag));
             int c = getInterpolatedColor(colors, db*0.009f);
             paint.setColor(c);
             int x = pos%rWidth;
-            int y = i;
-            this.canvas.drawPoint(x, y, paint);
-            this.canvas.drawPoint(x, y, paint); // make color brighter
+            this.canvas.drawPoint(x, i, paint);
+            this.canvas.drawPoint(x, i, paint); // make color brighter
             //this.canvas.drawPoint(pos%rWidth, height-i, paint); // make color even brighter
         }
         
         // Draw bitmap
-        if (pos<rWidth) {
-            canvas.drawBitmap(bitmap, wColor, 0, paint);
-        } else {
-            canvas.drawBitmap(bitmap, (float) wColor - pos%rWidth, 0, paint);
-            canvas.drawBitmap(bitmap, (float) wColor + (rWidth - pos%rWidth), 0, paint);
+        if (bitmap != null) {
+            if (pos<rWidth) {
+                canvas.drawBitmap(bitmap, wColor, 0, paint);
+            } else {
+                canvas.drawBitmap(bitmap, (float) wColor - pos%rWidth, 0, paint);
+                canvas.drawBitmap(bitmap, (float) wColor + (rWidth - pos%rWidth), 0, paint);
+            }
         }
+
 
         // Draw color scale
         paint.setColor(Color.BLACK);
@@ -153,12 +172,12 @@ public class FrequencyView extends View {
         canvas.drawText("kHz", rWidth + wColor, 12*ratio, paint);
         if (logFrequency) {
         	for (int i=1; i<5; i++) {
-	    		float y = getRelativePosition((float) Math.pow(10,i), 1, samplingRate/2, logFrequency);
+	    		float y = getRelativePosition((float) Math.pow(10,i), (float)samplingRate/2);
 	    		canvas.drawText("1e"+i, rWidth + wColor, (1f-y)*height, paint);
     		}
         } else {
 	        for (int i=0; i<(samplingRate-500)/2; i+=1000)
-	            canvas.drawText(" "+i/1000, rWidth + wColor, height*(1f-(float) i/(samplingRate/2)), paint);
+	            canvas.drawText(" "+i/1000, rWidth + wColor, height*(1f-(float) i/((float)samplingRate/2)), paint);
         }
         
         pos++;
@@ -169,18 +188,17 @@ public class FrequencyView extends View {
      * Converts relative position of a value within given boundaries
      * Log=true for logarithmic scale
      */
-    private float getRelativePosition(float value, float minValue, float maxValue, boolean log) {
-    	if (log)	return ((float) Math.log10(1+value-minValue) / (float) Math.log10(1+maxValue-minValue));
-    	else		return (value-minValue)/(maxValue-minValue);
+    private float getRelativePosition(float value, float maxValue) {
+        return ((float) Math.log10(1+value- (float) 1) / (float) Math.log10(1+maxValue- (float) 1));
     }
     
     /**
      * Returns a value from its relative position within given boundaries
      * Log=true for logarithmic scale
      */
-    private float getValueFromRelativePosition(float position, float minValue, float maxValue, boolean log) {
-    	if (log)	return (float) (Math.pow(10, position*Math.log10(1+maxValue-minValue))+minValue-1);
-    	else		return minValue + position*(maxValue-minValue);
+    private float getValueFromRelativePosition(float position, float maxValue, boolean log) {
+    	if (log)	return (float) (Math.pow(10, position*Math.log10(1+maxValue- (float) 1))+ (float) 1 -1);
+    	else		return (float) 1 + position*(maxValue- (float) 1);
     }
     
     /**
