@@ -70,10 +70,7 @@ public class SpectrogramActivity extends AppCompatActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		// Share core
-		Misc.setAttribute("activity", this);
-		
+
 		// Load preferences
 		loadPreferences();
 		
@@ -322,7 +319,10 @@ public class SpectrogramActivity extends AppCompatActivity {
 	 * Load preferences
 	 */
 	private void loadPreferences() {
-		fftResolution = Integer.parseInt(Misc.getPreference(this, "fft_resolution", getString(R.string.preferences_fft_resolution_default_value)));
+		String resolution = Misc.getPreference(this, "fft_resolution", getString(R.string.preferences_fft_resolution_default_value));
+		if (resolution != null) {
+			fftResolution = Integer.parseInt(resolution);
+		}
 	}
 
 	
@@ -346,8 +346,9 @@ public class SpectrogramActivity extends AppCompatActivity {
 		im = new float[n];
  		bufferStack = new ArrayList<>();
 		int l = recorder.getBufferLength()/(n/2);
-		for (int i=0; i<l+1; i++) //+1 because the last one has to be used again and sent to first position
+		for (int i=0; i<l+1; i++) { //+1 because the last one has to be used again and sent to first position
 			bufferStack.add(new short[n/2]); // preallocate to avoid new within processing loop
+		}
 
         // Start recording
         startRecording();
@@ -404,37 +405,39 @@ public class SpectrogramActivity extends AppCompatActivity {
 				"window_type",
 				getString(R.string.preferences_window_type_default_value));
 
-		switch (window) {
-			case "Rectangular":
-				nativeLib.windowRectangular(re, n);
-				break;
-			case "Triangular":
-				nativeLib.windowTriangular(re, n);
-				break;
-			case "Welch":
-				nativeLib.windowWelch(re, n);
-				break;
-			case "Hanning":
-				nativeLib.windowHanning(re, n);
-				break;
-			case "Hamming":
-				nativeLib.windowHamming(re, n);
-				break;
-			case "Blackman":
-				nativeLib.windowBlackman(re, n);
-				break;
-			case "Nuttall":
-				nativeLib.windowNuttall(re, n);
-				break;
-			case "Blackman-Nuttall":
-				nativeLib.windowBlackmanNuttall(re, n);
-				break;
-			case "Blackman-Harris":
-				nativeLib.windowBlackmanHarris(re, n);
-				break;
+		if (window != null) {
+			switch (window) {
+				case "Rectangular":
+					nativeLib.windowRectangular(re, n);
+					break;
+				case "Triangular":
+					nativeLib.windowTriangular(re, n);
+					break;
+				case "Welch":
+					nativeLib.windowWelch(re, n);
+					break;
+				case "Hanning":
+					nativeLib.windowHanning(re, n);
+					break;
+				case "Hamming":
+					nativeLib.windowHamming(re, n);
+					break;
+				case "Blackman":
+					nativeLib.windowBlackman(re, n);
+					break;
+				case "Nuttall":
+					nativeLib.windowNuttall(re, n);
+					break;
+				case "Blackman-Nuttall":
+					nativeLib.windowBlackmanNuttall(re, n);
+					break;
+				case "Blackman-Harris":
+					nativeLib.windowBlackmanHarris(re, n);
+					break;
+			}
 		}
-		
-		nativeLib.fft(re, im, log2_n, 0);	// Move into frquency domain 
+
+		nativeLib.fft(re, im, log2_n, 0);	// Move into frequency domain
 		nativeLib.toPolar(re, im, n);	// Move to polar base
 
 		frequencyView.setMagnitudes(re);

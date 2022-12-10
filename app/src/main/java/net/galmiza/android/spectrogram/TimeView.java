@@ -16,7 +16,6 @@
 package net.galmiza.android.spectrogram;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -87,8 +86,8 @@ public class TimeView extends View {
     public void onDraw(Canvas canvas) {
     	int width = getWidth();
     	int height = getHeight();
-    	Activity a = (Activity) Misc.getAttribute("activity");
-	   	boolean nightMode = Misc.getPreference(a, "night_mode", true);
+
+	   	boolean nightMode = Misc.getPreference(getContext(), "night_mode", true);
     	
     	// Draw axis
 		paint.setStrokeWidth(1);
@@ -97,7 +96,11 @@ public class TimeView extends View {
     	canvas.drawLine(0, (float)height/2, width, (float)height/2, paint);
     	
     	// Draw wave
-    	paint.setStrokeWidth(Integer.parseInt(Misc.getPreference(a, "line_width", "1")));
+		String lineWidth = Misc.getPreference(getContext(), "line_width", "1");
+		if (lineWidth != null) {
+			paint.setStrokeWidth(Integer.parseInt(lineWidth));
+		}
+
     	if (!nightMode) paint.setColor(Color.BLACK);
 		else		 	paint.setColor(Color.WHITE);
     	float x1 = 0;
