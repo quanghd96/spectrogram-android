@@ -88,7 +88,7 @@ public class SpectrogramActivity extends AppCompatActivity {
 		if (Misc.getPreference(this, "keep_screen_on", false))
 			frequencyView.setKeepScreenOn(true);
 		frequencyView.setFFTResolution(fftResolution);
-        timeView.setFFTResolution(fftResolution);
+		timeView.setFFTResolution(fftResolution);
 		frequencyView.setSamplingRate(samplingRate);
 		
 		// Color mode
