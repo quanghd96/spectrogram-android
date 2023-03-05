@@ -19,7 +19,6 @@ import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
 import android.media.AudioFormat
 import android.media.MediaRecorder.AudioSource
-import net.galmiza.android.spectrogram.ContinuousRecord.OnBufferReadyListener
 
 /**
  * Recording service
