@@ -16,7 +16,6 @@
 package net.galmiza.android.spectrogram;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -34,8 +33,8 @@ import android.view.View;
 public class TimeView extends View {
 	
 	// Attributes
-    private Paint paint = new Paint();
-    private GestureDetector detector;
+    private final Paint paint = new Paint();
+    private final GestureDetector detector;
     private float gain = 1.0f;
     private int fftResolution;
     private float[] wave;
@@ -85,25 +84,29 @@ public class TimeView extends View {
      */
     @Override
     public void onDraw(Canvas canvas) {
-    	int width = canvas.getWidth();
-    	int height = canvas.getHeight();
-    	Activity a = (Activity) Misc.getAttribute("activity");
-	   	boolean nightMode = Misc.getPreference(a, "night_mode", true);
+    	int width = getWidth();
+    	int height = getHeight();
+
+	   	boolean nightMode = Misc.getPreference(getContext(), "night_mode", true);
     	
     	// Draw axis
 		paint.setStrokeWidth(1);
 		if (!nightMode) paint.setColor(Color.LTGRAY);
 		else			paint.setColor(Color.DKGRAY);
-    	canvas.drawLine(0, height/2, width, height/2, paint);
+    	canvas.drawLine(0, (float)height/2, width, (float)height/2, paint);
     	
     	// Draw wave
-    	paint.setStrokeWidth(Integer.valueOf(Misc.getPreference(a, "line_width", "1")));
+		String lineWidth = Misc.getPreference(getContext(), "line_width", "1");
+		if (lineWidth != null) {
+			paint.setStrokeWidth(Integer.parseInt(lineWidth));
+		}
+
     	if (!nightMode) paint.setColor(Color.BLACK);
 		else		 	paint.setColor(Color.WHITE);
     	float x1 = 0;
     	float y1 = height*(0.5f+0.5f*gain*wave[0]);
     	for (int i=1; i<fftResolution; i++) {
-    		float x2 = width*i/(fftResolution);
+    		float x2 = (float)width*i/(fftResolution);
     		float y2 = height*(0.5f+0.5f*gain*wave[i]);
     		if ((x1>0 && x1<width) && (x2>0 && x2<width))
     			canvas.drawLine(x1, height-y1, x2, height-y2, paint);

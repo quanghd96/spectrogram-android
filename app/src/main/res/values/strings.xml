@@ -5,6 +5,8 @@
 	
     <!-- Menu -->
     <string name="menu_main_item_settings">Settings</string>
+    <string name="menu_play">Play</string>
+    <string name="menu_pause">Pause</string>
     
     <!-- View headers -->
     <string name="view_header_time">Frame length: %1$s ms</string>

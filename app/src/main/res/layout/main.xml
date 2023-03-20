@@ -1,41 +1,54 @@
+
+
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads"
     xmlns:tools="http://schemas.android.com/tools"
 	android:id="@+id/linearlayout_main"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity" >
+    tools:context=".SpectrogramActivity" >
 
 	<TextView
-	    android:id="@+id/textview_time_header"
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:textSize="14sp"
-	    android:padding="3sp"
+		android:id="@+id/textview_time_header"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
 		android:clickable="true"
-		android:onClick="onTimeViewHeaderClick" />
+		android:focusable="true"
+		android:minHeight="32dp"
+		android:padding="3sp"
+		android:textSize="14sp"
+		tools:ignore="SpeakableTextPresentCheck" />
 		
     <net.galmiza.android.spectrogram.TimeView
         android:id="@+id/time_view"
 	    android:layout_weight="1"
 	    android:layout_width="fill_parent"
 	    android:layout_height="0dip" />
-    
+
 	<TextView
-	    android:id="@+id/textview_frequency_header"
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:textSize="14sp"
-	    android:padding="3sp"
+		android:id="@+id/textview_frequency_header"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
 		android:clickable="true"
-		android:onClick="onFrequencyViewHeaderClick" />
+		android:focusable="true"
+		android:minHeight="48dp"
+		android:padding="3sp"
+		android:textSize="14sp"
+		tools:ignore="SpeakableTextPresentCheck" />
 	
     <net.galmiza.android.spectrogram.FrequencyView
         android:id="@+id/frequency_view"
 	    android:layout_weight="2"
 	    android:layout_width="fill_parent"
 	    android:layout_height="0dip" />
+
+	<androidx.fragment.app.FragmentContainerView
+		android:id="@+id/fragment_container_view"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:visibility="gone"
+		android:name="net.galmiza.android.spectrogram.PreferencesFragment"
+		tools:layout="@android:layout/preference_category" />
 
 </LinearLayout>

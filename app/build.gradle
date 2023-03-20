@@ -1,17 +1,18 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 33
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     defaultConfig {
         applicationId "net.galmiza.android.spectrogram"
         minSdkVersion 21
-        targetSdkVersion 28
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
     }
@@ -21,11 +22,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    namespace 'net.galmiza.android.spectrogram'
 }
 
 dependencies {
     implementation fileTree(include: ['.jar'], dir: 'libs')
     implementation fileTree(include: ['.so'], dir: 'src/main/jniLibs')
-    testImplementation 'junit:junit:4.12'
-    implementation 'com.android.support:appcompat-v7:28.0.0'
+    testImplementation 'junit:junit:4.13.2'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.preference:preference-ktx:1.2.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.0'
 }

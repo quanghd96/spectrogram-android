@@ -15,18 +15,21 @@
 
 package net.galmiza.android.spectrogram;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import net.galmiza.android.engine.sound.SoundEngine;
 
@@ -46,20 +49,16 @@ import java.util.List;
  *   onActivityResult (response from external activities)
  */
 public class SpectrogramActivity extends AppCompatActivity {
-	
-	// Constant
-	static final float PI = (float) Math.PI;
+
 	static final int INTENT_SETTINGS = 0;
     static final int MY_PERMISSIONS_REQUEST_RECORD_AUDIO = 0;
-	
-	// Attributes
-	private ActionBar actionBar;
+
 	private FrequencyView frequencyView;
 	private TimeView timeView;
 	private ContinuousRecord recorder;
 	private SoundEngine nativeLib;
 	private Menu menu;
-	private int samplingRate = 44100;
+	private final int samplingRate = 44100;
 	private int fftResolution;
 	
 	// Buffers
@@ -71,10 +70,7 @@ public class SpectrogramActivity extends AppCompatActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		// Share core
-		Misc.setAttribute("activity", this);
-		
+
 		// Load preferences
 		loadPreferences();
 		
@@ -83,7 +79,7 @@ public class SpectrogramActivity extends AppCompatActivity {
 		nativeLib.initFSin();
 		
 		// Recorder & player
-		recorder = new ContinuousRecord(samplingRate);
+		recorder = new ContinuousRecord(samplingRate, this);
 		
 		// Create view for frequency display
 		setContentView(R.layout.main);
@@ -92,7 +88,7 @@ public class SpectrogramActivity extends AppCompatActivity {
 		if (Misc.getPreference(this, "keep_screen_on", false))
 			frequencyView.setKeepScreenOn(true);
 		frequencyView.setFFTResolution(fftResolution);
-        timeView.setFFTResolution(fftResolution);
+		timeView.setFFTResolution(fftResolution);
 		frequencyView.setSamplingRate(samplingRate);
 		
 		// Color mode
@@ -109,11 +105,14 @@ public class SpectrogramActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         if (util.Misc.getPreference(this, "hide_status_bar", false))
         	getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);*/
-        
+
 		// Action bar
-		actionBar = getSupportActionBar();
-		actionBar.setTitle(getString(R.string.app_name));
-		actionBar.setSubtitle(getString(R.string.app_subtitle));
+		// Attributes
+		ActionBar actionBar = getSupportActionBar();
+		if (actionBar != null) {
+			actionBar.setTitle(getString(R.string.app_name));
+			actionBar.setSubtitle(getString(R.string.app_subtitle));
+		}
 
 		// Request record audio permission
 		if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
@@ -122,6 +121,9 @@ public class SpectrogramActivity extends AppCompatActivity {
         } else {
 			ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.RECORD_AUDIO}, MY_PERMISSIONS_REQUEST_RECORD_AUDIO);
 		}
+
+		findViewById(R.id.textview_frequency_header).setOnClickListener(this::onFrequencyViewHeaderClick);
+		findViewById(R.id.textview_time_header).setOnClickListener(this::onTimeViewHeaderClick);
 	}
 	
 	
@@ -136,7 +138,7 @@ public class SpectrogramActivity extends AppCompatActivity {
 		TextView time = findViewById(R.id.textview_time_header);
 		time.setText(String.format(getString(R.string.view_header_time), df.format(1000.0f*fftBuffer.length/samplingRate)));
 			
-		// Freqnecy view
+		// Frequency view
 		TextView frequency = findViewById(R.id.textview_frequency_header);
 		String window = Misc.getPreference(
 				this,
@@ -164,7 +166,7 @@ public class SpectrogramActivity extends AppCompatActivity {
 	 * Control recording service
 	 */
 	private void startRecording() {
-		recorder.start(recordBuffer -> getTrunks(recordBuffer));
+		recorder.start(this::getTrunks);
 	}
 	private void stopRecording() {
 		recorder.stop();
@@ -174,17 +176,15 @@ public class SpectrogramActivity extends AppCompatActivity {
      * Handles response to permission request
      */
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_RECORD_AUDIO: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    loadEngine();
-                    updateHeaders();
-                }
-                return;
-            }
-        }
-    }
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+		if (requestCode == MY_PERMISSIONS_REQUEST_RECORD_AUDIO) {
+			if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+				loadEngine();
+				updateHeaders();
+			}
+		}
+	}
 
 	/**
 	 * Handles interactions with the menu
@@ -194,29 +194,64 @@ public class SpectrogramActivity extends AppCompatActivity {
 		getMenuInflater().inflate(R.menu.main_menu, menu);
 		this.menu = menu;
 		menu.findItem(R.id.action_bar_menu_play).setVisible(false);
+		menu.findItem(R.id.action_bar_menu_close).setVisible(false);
 		return true;
 	}
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		
-		switch (item.getItemId()) {
-		case R.id.action_bar_menu_settings:
-			Intent intent = new Intent(this,PreferencesActivity.class);
-			startActivityForResult(intent, INTENT_SETTINGS);
-			return true;
-		case R.id.action_bar_menu_play:
+
+		int id = item.getItemId();
+
+		if (id == R.id.action_bar_menu_settings) {
+
+			findViewById(R.id.fragment_container_view).setVisibility(View.VISIBLE);
+			findViewById(R.id.textview_time_header).setVisibility(View.GONE);
+			findViewById(R.id.textview_frequency_header).setVisibility(View.GONE);
+
+			menu.findItem(R.id.action_bar_menu_play).setVisible(false);
+			menu.findItem(R.id.action_bar_menu_pause).setVisible(false);
+			menu.findItem(R.id.action_bar_menu_settings).setVisible(false);
+			menu.findItem(R.id.action_bar_menu_close).setVisible(true);
+
+			getSupportFragmentManager().beginTransaction()
+					.setReorderingAllowed(true)
+					.add(R.id.fragment_container_view, PreferencesFragment.class, null)
+					.commit();
+			return  true;
+		}
+		if (id == R.id.action_bar_menu_play) {
 			menu.findItem(R.id.action_bar_menu_play).setVisible(false);
 			menu.findItem(R.id.action_bar_menu_pause).setVisible(true);
 			startRecording();
-			return true;
-		case R.id.action_bar_menu_pause:
+			return  true;
+		}
+		if (id == R.id.action_bar_menu_pause) {
 			menu.findItem(R.id.action_bar_menu_pause).setVisible(false);
 			menu.findItem(R.id.action_bar_menu_play).setVisible(true);
 			stopRecording();
-			return true;
+			return  true;
 		}
-		return false;
+		if (id == R.id.action_bar_menu_close) {
+
+			if (this.recorder.isRun()) {
+				menu.findItem(R.id.action_bar_menu_pause).setVisible(true);
+				menu.findItem(R.id.action_bar_menu_play).setVisible(false);
+			} else {
+				menu.findItem(R.id.action_bar_menu_pause).setVisible(false);
+				menu.findItem(R.id.action_bar_menu_play).setVisible(true);
+			}
+
+			menu.findItem(R.id.action_bar_menu_settings).setVisible(true);
+			menu.findItem(R.id.action_bar_menu_close).setVisible(false);
+
+			findViewById(R.id.fragment_container_view).setVisibility(View.GONE);
+			findViewById(R.id.textview_time_header).setVisibility(View.VISIBLE);
+			findViewById(R.id.textview_frequency_header).setVisibility(View.VISIBLE);
+
+			return  true;
+		}
+		return  false;
 	}
 	
 	/**
@@ -224,36 +259,37 @@ public class SpectrogramActivity extends AppCompatActivity {
 	 */
 	@Override
 	protected void onActivityResult (int requestCode, int resultCode, Intent intent) {
-	    //if (resultCode == Activity.RESULT_OK) {
-	    	if (requestCode == INTENT_SETTINGS) {
-	    		
-	    		// Stop and release recorder if running
-	    		recorder.stop();
-	    		recorder.release();
-	    		
-	    		// Update preferences
-	    		loadPreferences();
-	    		
-	    		// Notify view
-	    		frequencyView.setFFTResolution(fftResolution);
-	    		timeView.setFFTResolution(fftResolution);
+		//if (resultCode == Activity.RESULT_OK) {
+		super.onActivityResult(requestCode, resultCode, intent);
+		if (requestCode == INTENT_SETTINGS) {
 
-                if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-                    loadEngine();
-                    updateHeaders();
-                }
-	    		
-	    		// Update color mode
-	    		boolean nightMode = Misc.getPreference(this, "night_mode", false);
-	            if (!nightMode)	{
-	            	frequencyView.setBackgroundColor(Color.WHITE);
-	            	timeView.setBackgroundColor(Color.WHITE);
-	            } else {
-	            	frequencyView.setBackgroundColor(Color.BLACK);
-	            	timeView.setBackgroundColor(Color.BLACK);
-	            }
-	    	}
-	    //}
+			// Stop and release recorder if running
+			recorder.stop();
+			recorder.release();
+
+			// Update preferences
+			loadPreferences();
+
+			// Notify view
+			frequencyView.setFFTResolution(fftResolution);
+			timeView.setFFTResolution(fftResolution);
+
+			if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+				loadEngine();
+				updateHeaders();
+			}
+
+			// Update color mode
+			boolean nightMode = Misc.getPreference(this, "night_mode", false);
+			if (!nightMode) {
+				frequencyView.setBackgroundColor(Color.WHITE);
+				timeView.setBackgroundColor(Color.WHITE);
+			} else {
+				frequencyView.setBackgroundColor(Color.BLACK);
+				timeView.setBackgroundColor(Color.BLACK);
+			}
+		}
+		//}
 	}
 	
 	@Override
@@ -283,7 +319,10 @@ public class SpectrogramActivity extends AppCompatActivity {
 	 * Load preferences
 	 */
 	private void loadPreferences() {
-		fftResolution = Integer.parseInt(Misc.getPreference(this, "fft_resolution", getString(R.string.preferences_fft_resolution_default_value)));
+		String resolution = Misc.getPreference(this, "fft_resolution", getString(R.string.preferences_fft_resolution_default_value));
+		if (resolution != null) {
+			fftResolution = Integer.parseInt(resolution);
+		}
 	}
 
 	
@@ -307,8 +346,9 @@ public class SpectrogramActivity extends AppCompatActivity {
 		im = new float[n];
  		bufferStack = new ArrayList<>();
 		int l = recorder.getBufferLength()/(n/2);
-		for (int i=0; i<l+1; i++) //+1 because the last one has to be used again and sent to first position
+		for (int i=0; i<l+1; i++) { //+1 because the last one has to be used again and sent to first position
 			bufferStack.add(new short[n/2]); // preallocate to avoid new within processing loop
+		}
 
         // Start recording
         startRecording();
@@ -364,18 +404,40 @@ public class SpectrogramActivity extends AppCompatActivity {
 				this,
 				"window_type",
 				getString(R.string.preferences_window_type_default_value));
-		
-		if (window.equals("Rectangular"))			nativeLib.windowRectangular(re, n);
-		else if (window.equals("Triangular"))		nativeLib.windowTriangular(re, n);
-		else if (window.equals("Welch"))			nativeLib.windowWelch(re, n);
-		else if (window.equals("Hanning"))			nativeLib.windowHanning(re, n);
-		else if (window.equals("Hamming"))			nativeLib.windowHamming(re, n);
-		else if (window.equals("Blackman"))			nativeLib.windowBlackman(re, n);
-		else if (window.equals("Nuttall"))			nativeLib.windowNuttall(re, n);
-		else if (window.equals("Blackman-Nuttall"))	nativeLib.windowBlackmanNuttall(re, n);
-		else if (window.equals("Blackman-Harris"))	nativeLib.windowBlackmanHarris(re, n);
-		
-		nativeLib.fft(re, im, log2_n, 0);	// Move into frquency domain 
+
+		if (window != null) {
+			switch (window) {
+				case "Rectangular":
+					nativeLib.windowRectangular(re, n);
+					break;
+				case "Triangular":
+					nativeLib.windowTriangular(re, n);
+					break;
+				case "Welch":
+					nativeLib.windowWelch(re, n);
+					break;
+				case "Hanning":
+					nativeLib.windowHanning(re, n);
+					break;
+				case "Hamming":
+					nativeLib.windowHamming(re, n);
+					break;
+				case "Blackman":
+					nativeLib.windowBlackman(re, n);
+					break;
+				case "Nuttall":
+					nativeLib.windowNuttall(re, n);
+					break;
+				case "Blackman-Nuttall":
+					nativeLib.windowBlackmanNuttall(re, n);
+					break;
+				case "Blackman-Harris":
+					nativeLib.windowBlackmanHarris(re, n);
+					break;
+			}
+		}
+
+		nativeLib.fft(re, im, log2_n, 0);	// Move into frequency domain
 		nativeLib.toPolar(re, im, n);	// Move to polar base
 
 		frequencyView.setMagnitudes(re);
